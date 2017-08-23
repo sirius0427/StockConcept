@@ -1,0 +1,11 @@
+﻿##################AYUI MVC 文件说明 START##################
+
+统称 UserControl    Page   Window这些类型，包括子类型都统称为View层
+
+通过View上的顶部的 DataContext   指定Controller层
+
+Controller层  的构造函数 初始化 Model层和Controller的操作
+
+通过集成Mvvmlight的Messenger 的消息组件，完成各个 Controller和View的通讯。
+
+##########################文件说明 END###################
