@@ -137,16 +137,31 @@
   <ItemGroup>
     <Compile Include="Controllers\ViewStartController.cs" />
     <Compile Include="Models\ViewStartModel.cs" />
+    <Compile Include="NotifyData.cs" />
     <Compile Include="Startup.cs" />
     <Page Include="Contents\Styles\AYUIProjectDictionary.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\messagebox.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\NotificationWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\_ViewStart.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
     <Compile Include="Global.asax.cs" />
+    <Compile Include="Views\messagebox.xaml.cs">
+      <DependentUpon>messagebox.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\NotificationWindow.xaml.cs">
+      <DependentUpon>NotificationWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\_ViewStart.xaml.cs">
       <DependentUpon>_ViewStart.xaml</DependentUpon>
       <SubType>Code</SubType>
@@ -266,6 +281,11 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Contents\Images\loading.gif" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="ring.wav">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\System.Data.SQLite.Core.1.0.105.0\build\net40\System.Data.SQLite.Core.targets" Condition="Exists('..\packages\System.Data.SQLite.Core.1.0.105.0\build\net40\System.Data.SQLite.Core.targets')" />

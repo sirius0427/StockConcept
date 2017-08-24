@@ -7,6 +7,18 @@ using System.Windows.Media;
 using System.Data.SQLite;
 using System.Windows.Documents;
 using MySql.Data.MySqlClient;
+using System.Collections.ObjectModel;
+using System.Threading;
+using System.Diagnostics;
+using System.ComponentModel;
+using System.Windows.Markup;
+using System.CodeDom.Compiler;
+using System.Windows.Threading;
+using System.Text.RegularExpressions;
+using System.Media;
+using System.Linq;
+using System.Collections.Generic;
+using StockConcept.Views;
 
 namespace StockConcept
 {
@@ -16,6 +28,8 @@ namespace StockConcept
     public partial class _ViewStart : AyWindow
     {
         public string dbPath = "Data Source =" + Environment.CurrentDirectory + "/zyg.db";
+        private Timer hudong_Thread_Time;
+        private long hudong_lasttime;
 
         public _ViewStart()
         {
@@ -55,7 +69,7 @@ namespace StockConcept
             shengji.Visibility = Visibility.Collapsed;
             nothing.Visibility = Visibility.Collapsed;
 
-            if ( listBox_ticai.Items.Count == 0 )
+            if (listBox_ticai.Items.Count == 0)
             {
                 F10ticai.Visibility = Visibility.Collapsed;
                 nothing.Visibility = Visibility.Visible;
@@ -72,7 +86,7 @@ namespace StockConcept
             shengji.Visibility = Visibility.Collapsed;
             nothing.Visibility = Visibility.Collapsed;
 
-            if ( listBox_gudong.Items.Count == 0 )
+            if (listBox_gudong.Items.Count == 0)
             {
                 gudong.Visibility = Visibility.Collapsed;
                 nothing.Visibility = Visibility.Visible;
@@ -89,7 +103,7 @@ namespace StockConcept
             shengji.Visibility = Visibility.Collapsed;
             nothing.Visibility = Visibility.Collapsed;
 
-            if ( ListView_xinwen.Items.Count == 0)
+            if (ListView_xinwen.Items.Count == 0)
             {
                 xingwen.Visibility = Visibility.Collapsed;
                 nothing.Visibility = Visibility.Visible;
@@ -105,12 +119,9 @@ namespace StockConcept
             hudong.Visibility = Visibility.Visible;
             shengji.Visibility = Visibility.Collapsed;
             nothing.Visibility = Visibility.Collapsed;
+            KeyWord.Visibility = Visibility.Visible;
+            search_hudong(sender, e);
 
-            if (ListBox_hudong.Items.Count == 0)
-            {
-                hudong.Visibility = Visibility.Collapsed;
-                nothing.Visibility = Visibility.Visible;
-            }
         }
 
         private void 软件升级_Click(object sender, RoutedEventArgs e)
@@ -240,15 +251,15 @@ namespace StockConcept
             search_gudong(sender, e);
             search_xinwen(sender, e);
             search_hudong(sender, e);
-            if ((bool) F10题材搜索.IsChecked )
+            if ((bool)F10题材搜索.IsChecked)
             {
                 F10题材搜索_Click(sender, e);
             }
-            else if ((bool)股东搜索.IsChecked )
+            else if ((bool)股东搜索.IsChecked)
             {
                 股东搜索_Click(sender, e);
             }
-            else if ((bool)新闻搜索.IsChecked )
+            else if ((bool)新闻搜索.IsChecked)
             {
                 新闻搜索_Click(sender, e);
             }
@@ -402,7 +413,6 @@ namespace StockConcept
 
         private void search_xinwen(object sender, RoutedEventArgs e)
         {
-            int rowcount = 0;
             if (Equals(KeyWord.Text, ""))
             {
                 MessageBox.Show("请在输入框输入需要查询的关键词，否则可能会有太多结果");
@@ -456,45 +466,91 @@ namespace StockConcept
 
         }
 
+        //public ObservableCollection<MyData> dataset_hudong;
+        List<MyData> dataset_hudong = new List<MyData>();
+
         private void search_hudong(object sender, RoutedEventArgs e)
         {
-            if (Equals(KeyWord.Text, ""))
+            //List<MyData> dataset_hudong = new List<MyData>();
+            String mysqlStr = "Database=zyg;Data Source=sirius0427.jios.org;User Id=cst;Password=q1w2e3r4t5Y^U&I*O(P);pooling=false;CharSet=utf8;port=3307";
+            MySqlConnection mysql = new MySqlConnection(mysqlStr);
+            mysql.Open();
+            String sqlSearch = "select max(collectiontime) as time from newsinfo where articletype='2'";
+            MySqlCommand mySqlCommand = new MySqlCommand(sqlSearch, mysql);
+            MySqlDataReader reader = mySqlCommand.ExecuteReader();
+            reader.Read();
+            hudong_lasttime = reader["time"].ToLong();
+            reader.Close();
+            sqlSearch = "select from_unixtime(collectiontime/1000) as time,title,digest,sourcename from newsinfo where (title like '%" + KeyWord.Text + "%' or digest like '%" + KeyWord.Text + "%') and articletype='2' and collectiontime <= '" + hudong_lasttime + "' order by collectiontime desc limit 100" ;
+            mySqlCommand = new MySqlCommand(sqlSearch, mysql);
+            reader = mySqlCommand.ExecuteReader();
+            try
             {
-                MessageBox.Show("请在输入框输入需要查询的关键词，否则可能会有太多结果");
-            }
-            else
-            {
-                String mysqlStr = "Database=zyg;Data Source=sirius0427.jios.org;User Id=cst;Password=q1w2e3r4t5Y^U&I*O(P);pooling=false;CharSet=utf8;port=3307";
-                MySqlConnection mysql = new MySqlConnection(mysqlStr);
-
-                mysql.Open();
-                String sqlSearch = "select from_unixtime(collectiontime/1000) as time,title,digest,sourcename from newsinfo where title like '%" + KeyWord.Text + "%' and articletype='2' order by collectiontime desc limit 200";
-                MySqlCommand mySqlCommand = new MySqlCommand(sqlSearch, mysql);
-
-                MySqlDataReader reader = mySqlCommand.ExecuteReader();
-                try
+                while (reader.Read())
                 {
-                    ListBox_hudong.Items.Clear();
-                    while (reader.Read())
+                    if (reader.HasRows)
                     {
-                        if (reader.HasRows)
+                        int startIndex = 0;
+                        int num2 = 0;
+                        string str = "";
+                        string str2 = "";
+                        MyData item = new MyData
                         {
-                            //string title = reader["title"].ToString();
-                            ListBox_hudong.Items.Add(reader["time"] + "  " + reader["sourcename"] + Environment.NewLine + reader["title"].ToString().Replace(" \n", "") + Environment.NewLine + reader["digest"] + Environment.NewLine);
+                            time = reader["time"].ToString()
+                        };
+                        string str3 = reader["title"].ToString().Replace("\n", "");
+                        if (reader["sourcename"].Equals("深证互动"))
+                        {
+                            startIndex = str3.IndexOf("问", 0) + 2;
+                            num2 = str3.IndexOf("):", 0) + 2;
+                            str = str3.Substring(startIndex, (num2 - startIndex) - 1);
+                            str2 = str3.Substring(num2, str3.Length - num2);
                         }
-
+                        else if (reader["sourcename"].Equals(" 上证互动"))
+                        {
+                            startIndex = str3.IndexOf(":", 0) + 1;
+                            num2 = str3.IndexOf(")", 0) + 1;
+                            str = str3.Substring(startIndex, num2 - startIndex);
+                            str2 = str3.Substring(num2, str3.Length - num2);
+                        }
+                        str.Trim();
+                        str2.Trim();
+                        string[] textArray1 = new string[] { "　　问：", str2, Environment.NewLine, "　　答：", reader["digest"].ToString() };
+                        item.title = string.Concat(textArray1);
+                        item.sourcename = str + "\n" + reader["time"].ToString();
+                        int num3 = 0;
+                        if (hudong_filter.IsChecked.Value)
+                        {
+                            foreach (string str4 in Regex.Split(hudong_filtertext.Text, ","))
+                            {
+                                if (item.title.IndexOf(str4) >= 0)
+                                {
+                                    num3 = 1;
+                                }
+                            }
+                        }
+                        else
+                        {
+                            num3 = 1;
+                        }
+                        if (num3 == 1)
+                        {
+                            dataset_hudong.Add(item);
+                        }
                     }
-                }
-                catch (Exception)
-                {
-                    MessageBox.Show("查询失败了！");
-                }
-                finally
-                {
-                    reader.Close();
-                    mysql.Close();
+                    ListView_hudong.ItemsSource = dataset_hudong;
                 }
             }
+            catch (Exception)
+            {
+                MessageBox.Show("查询失败了！" + reader["title"].ToString().Replace("\n", ""));
+            }
+            finally
+            {
+                reader.Close();
+                mysql.Close();
+            }
+
         }
 
 
@@ -506,14 +562,6 @@ namespace StockConcept
             }
         }
 
-        private void ListBox_hudong_KeyDown(object sender, KeyEventArgs e)
-        {
-            if ( (Keyboard.Modifiers & ModifierKeys.Control) == ModifierKeys.Control && e.Key==Key.C)//用户是否按下了Ctrl键
-            {
-                Clipboard.SetText(ListBox_hudong.Items[ListBox_hudong.SelectedIndex].ToString());
-                MessageBox.Show("选择的项已拷贝至粘贴板");
-            }
-        }
 
         private void ListView_xinwen_KeyDown(object sender, KeyEventArgs e)
         {
@@ -522,7 +570,259 @@ namespace StockConcept
                 MyData data = new MyData();
                 data = (MyData)ListView_xinwen.SelectedItem;
 
-                Clipboard.SetText( data.time + Environment.NewLine + data.title + Environment.NewLine + data.url );
+                Clipboard.SetText(data.time + Environment.NewLine + data.title + Environment.NewLine + data.url);
+                MessageBox.Show("选择的项已拷贝至粘贴板");
+            }
+        }
+
+        private void hudong_autofresh_Checked(object sender, RoutedEventArgs e)
+        {
+            hudong_Thread_Time = new System.Threading.Timer(new TimerCallback(hudong_Thread_Timer_Method), null, 0, 5000);
+        }
+
+        private void hudong_autofresh_Unchecked(object sender, RoutedEventArgs e)
+        {
+            hudong_Thread_Time.Dispose();
+        }
+
+        private void hudong_Thread_Timer_Method(object o)
+        {
+            long hudong_maxtime;
+            MySqlConnection connection = new MySqlConnection("Database=zyg;Data Source=sirius0427.jios.org;User Id=cst;Password=q1w2e3r4t5Y^U&I*O(P);pooling=false;CharSet=utf8;port=3307");
+            connection.Open();
+            MySqlDataReader reader = new MySqlCommand("select max(collectiontime) as time from newsinfo where articletype='2'", connection).ExecuteReader();
+            reader.Read();
+            hudong_maxtime = reader["time"].ToLong();
+            reader.Close();
+            object[] objArray1 = new object[] { "select from_unixtime(collectiontime/1000) as time,title,digest,sourcename from newsinfo where articletype='2' and collectiontime >", hudong_lasttime, " and collectiontime <=", hudong_maxtime, " order by collectiontime" };
+            reader = new MySqlCommand(string.Concat(objArray1), connection).ExecuteReader();
+            try
+            {
+                int insertflag = 0;
+                while (reader.Read())
+                {
+                    if (reader.HasRows)
+                    {
+                        int startIndex = 0;
+                        int num2 = 0;
+                        string str = "";
+                        string str2 = "";
+                        MyData data = new MyData
+                        {
+                            time = reader["time"].ToString()
+                        };
+                        string str3 = reader["title"].ToString().Replace("\n", "");
+                        if (reader["sourcename"].Equals("深证互动"))
+                        {
+                            startIndex = str3.IndexOf("问", 0) + 2;
+                            num2 = str3.IndexOf("):", 0) + 2;
+                            str = str3.Substring(startIndex, (num2 - startIndex) - 1);
+                            str2 = str3.Substring(num2, str3.Length - num2);
+                        }
+                        else if (reader["sourcename"].Equals(" 上证互动"))
+                        {
+                            startIndex = str3.IndexOf(":", 0) + 1;
+                            num2 = str3.IndexOf(")", 0) + 1;
+                            str = str3.Substring(startIndex, num2 - startIndex);
+                            str2 = str3.Substring(num2, str3.Length - num2);
+                        }
+                        str.Trim();
+                        str2.Trim();
+                        string[] textArray1 = new string[] { "　　问：", str2, Environment.NewLine, "　　答：", reader["digest"].ToString() };
+                        data.title = string.Concat(textArray1);
+                        data.sourcename = str + "\n" + reader["time"].ToString();
+                        string[] textArray2 = new string[] { str, "\t", reader["time"].ToString(), "\n问：", str2, Environment.NewLine, "\n答：", reader["digest"].ToString() };
+                        string parameter = string.Concat(textArray2);
+                        //Thread thread1 = new Thread(new ParameterizedThreadStart(new StartMessageBox().CreateCounterWindowThread));
+                        //thread1.SetApartmentState(ApartmentState.STA);
+                        //thread1.IsBackground = true;
+                        //thread1.Start(parameter);
+
+                        base.Dispatcher.BeginInvoke((Action)delegate
+                        {
+                            NotifyData data1 = new NotifyData();
+                            data1.Title = "抓妖股实时互动";
+                            data1.Content = parameter;
+
+                            NotificationWindow dialog = new NotificationWindow();//new 一个通知
+                            dialog.Closed += Dialog_Closed;
+                            dialog.TopFrom = GetTopFrom();
+                            _dialogs.Add(dialog);
+                            dialog.DataContext = data1;//设置通知里要显示的数据
+                            dialog.Show();
+                        }, null);
+
+                        base.Dispatcher.BeginInvoke((Action)delegate
+                        {
+                            if (hudong_filter.IsChecked.Value)
+                            {
+                                foreach (string str1 in Regex.Split(hudong_filtertext.Text, ",", RegexOptions.IgnoreCase))
+                                {
+                                    if (data.title.IndexOf(str1) >= 0)
+                                    {
+                                        insertflag = 1;
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                insertflag = 1;
+                            }
+                            if (insertflag == 1)
+                            {
+                                dataset_hudong.Insert(0, data);
+                                new SoundPlayer("ring.wav").Play();
+
+                            }
+                        }, null);
+
+                    }
+                }
+                hudong_lasttime = hudong_maxtime;
+                base.Dispatcher.BeginInvoke((Action)delegate ()
+                {
+                    ListView_hudong.ItemsSource = dataset_hudong;
+                }, null);
+            }
+            catch (Exception)
+            {
+                MessageBox.Show("查询失败了！" + reader["title"].ToString().Replace("\n", ""));
+            }
+            finally
+            {
+                reader.Close();
+                connection.Close();
+            }
+        }
+
+        //public class StartMessageBox
+        //{
+        //    // Fields
+        //    private messagebox MsgBox;
+
+        //    // Methods
+        //    public void CreateCounterWindowThread(object obj)
+        //    {
+        //        string message = Convert.ToString(obj);
+        //        MsgBox = new messagebox(message);
+        //        MsgBox.Topmost = true;
+        //        MsgBox.Show();
+        //        MsgBox.Closed += (s, e) => MsgBox.Dispatcher.BeginInvokeShutdown(DispatcherPriority.Background);
+        //        StartCloseTimer();
+        //        Dispatcher.Run();
+        //    }
+
+        //    private void StartCloseTimer()
+        //    {
+        //        DispatcherTimer timer1 = new DispatcherTimer
+        //        {
+        //            Interval = TimeSpan.FromSeconds(30.0)
+        //        };
+        //        timer1.Tick += new EventHandler(TimerTick);
+        //        timer1.Start();
+        //    }
+
+        //    private void TimerTick(object sender, EventArgs e)
+        //    {
+        //        DispatcherTimer timer1 = (DispatcherTimer)sender;
+        //        timer1.Stop();
+        //        timer1.Tick -= new EventHandler(TimerTick);
+        //        MsgBox.Close();
+        //    }
+        //}
+
+        public static List<NotificationWindow> _dialogs = new List<NotificationWindow>();
+        private void Dialog_Closed(object sender, EventArgs e)
+        {
+            var closedDialog = sender as NotificationWindow;
+            _dialogs.Remove(closedDialog);
+        }
+        double GetTopFrom()
+        {
+            //屏幕的高度-底部TaskBar的高度。
+            double topFrom = System.Windows.SystemParameters.WorkArea.Bottom - 10;
+            bool isContinueFind = _dialogs.Any(o => o.TopFrom == topFrom);
+
+            while (isContinueFind)
+            {
+                topFrom = topFrom - 210;//此处100是NotifyWindow的高 110-100剩下的10  是通知之间的间距
+                isContinueFind = _dialogs.Any(o => o.TopFrom == topFrom);
+            }
+
+            if (topFrom <= 0)
+                topFrom = System.Windows.SystemParameters.WorkArea.Bottom - 10;
+
+            return topFrom;
+        }
+
+        //public class messagebox : Window, IComponentConnector
+        //{
+        //    // Fields
+        //    private bool _contentLoaded;
+        //    internal RichTextBox richtextbox_message;
+        //    private DispatcherTimer timer_show = new DispatcherTimer();
+
+        //    // Methods
+        //    public messagebox(string Message)
+        //    {
+        //        this.InitializeComponent();
+        //        this.richtextbox_message.AppendText(Message);
+        //        this.timer_show.Interval = TimeSpan.FromMilliseconds(5000);
+        //        this.timer_show.Tick += new EventHandler(this.dispatcherTimer_Tick);
+        //        base.Left = SystemParameters.WorkArea.Width - base.Width;
+        //        base.Top = SystemParameters.PrimaryScreenHeight;
+        //        this.StopTop = SystemParameters.WorkArea.Height - base.Height;
+        //        this.timer_show.Start();
+        //    }
+
+        //    private void dispatcherTimer_Tick(object sender, EventArgs e)
+        //    {
+        //        while (true)
+        //        {
+        //            if (base.Top <= this.StopTop)
+        //            {
+        //                break;
+        //            }
+        //            base.Top -= 0.0273;
+        //        }
+        //        this.timer_show.Stop();
+        //    }
+
+        //    [DebuggerNonUserCode, GeneratedCode("PresentationBuildTasks", "4.0.0.0")]
+        //    public void InitializeComponent()
+        //    {
+        //        if (!this._contentLoaded)
+        //        {
+        //            this._contentLoaded = true;
+        //            Uri resourceLocator = new Uri("/StockConcept;component/views/messagebox.xaml", UriKind.Relative);
+        //            Application.LoadComponent(this, resourceLocator);
+        //        }
+        //    }
+
+        //    [DebuggerNonUserCode, GeneratedCode("PresentationBuildTasks", "4.0.0.0"), EditorBrowsable(EditorBrowsableState.Never)]
+        //    void IComponentConnector.Connect(int connectionId, object target)
+        //    {
+        //        if (connectionId == 1)
+        //        {
+        //            this.richtextbox_message = (RichTextBox)target;
+        //        }
+        //        else
+        //        {
+        //            this._contentLoaded = true;
+        //        }
+        //    }
+
+        //    // Properties
+        //    public double StopLeft { get; set; }
+
+        //    public double StopTop { get; set; }
+        //}
+
+        private void ListView_hudong_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (((Keyboard.Modifiers & ModifierKeys.Control) == ModifierKeys.Control) && (e.Key == Key.C))
+            {
+                Clipboard.SetText(this.ListView_hudong.Items[this.ListView_hudong.SelectedIndex].ToString());
                 MessageBox.Show("选择的项已拷贝至粘贴板");
             }
         }

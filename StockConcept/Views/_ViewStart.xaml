@@ -694,20 +694,101 @@
                     </ListView.View>
                 </ListView>
             </Grid>
-            <Grid x:Name="hudong" Margin="3,3,3,3" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"  Visibility="Collapsed" >
-                <ListBox x:Name="ListBox_hudong" FontSize="16" Foreground="White" KeyDown="ListBox_hudong_KeyDown">
-                    <ListBox.Background>
-                        <SolidColorBrush Color="black" Opacity="0.5"/>
-                    </ListBox.Background>
-                </ListBox>
+            <Grid x:Name="hudong" Margin="3,3,3,3" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"  Visibility="Visible" >
+                <Grid.RowDefinitions>
+                    <RowDefinition RowDefinition.Height="38" />
+                    <RowDefinition />
+                </Grid.RowDefinitions>
+                <Canvas FrameworkElement.Height="38" FrameworkElement.Margin="0,0,0,0" FrameworkElement.VerticalAlignment="Stretch" Grid.Row="0">
+                    <CheckBox x:Name="hudong_autofresh" ContentControl.Content="自动刷新" Control.Foreground="#FFFFFFFF" Control.Background="#FFFFFFFF" Canvas.Left="26" Canvas.Top="10" Control.FontSize="16" Control.VerticalContentAlignment="Center" FrameworkElement.VerticalAlignment="Center" Control.HorizontalContentAlignment="Center" FrameworkElement.HorizontalAlignment="Center" Checked="hudong_autofresh_Checked" Unchecked="hudong_autofresh_Unchecked" />
+                    <CheckBox x:Name="hudong_filter" ContentControl.Content="关键词过滤" Control.Foreground="#FFFFFFFF" Control.Background="#FFFFFFFF" Canvas.Left="126" Canvas.Top="10" Control.FontSize="16" Control.VerticalContentAlignment="Center" FrameworkElement.VerticalAlignment="Center" Control.HorizontalContentAlignment="Center" FrameworkElement.HorizontalAlignment="Center" />
+                    <control:AyTextBox Name="hudong_filtertext" Canvas.Left="246" FrameworkElement.Height="40" FrameworkElement.Width="800" Mask="请输入关键词，以半角,分隔" Control.FontSize="16" />
+                </Canvas>
+                <ListView Name="ListView_hudong" Control.FontSize="16" Control.Foreground="#FFFFFFFF" Grid.Row="1" ItemsControl.ItemsSource="{Binding dataset_hudong}" KeyDown="ListView_hudong_KeyDown">
+                    <Control.Background>
+                        <SolidColorBrush SolidColorBrush.Color="White" Brush.Opacity="0.8" />
+                    </Control.Background>
+                    <ListView.View>
+                        <GridView x:Name="GridView_hudong" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+                            <GridViewColumn GridViewColumn.Header="互动来源" GridViewColumn.Width="162">
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock TextBlock.TextWrapping="Wrap" TextBlock.Text="{Binding sourcename}" />
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
+                            <GridViewColumn GridViewColumn.Header="互动内容" GridViewColumn.Width="1150">
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock TextBlock.TextWrapping="Wrap" TextBlock.Text="{Binding title}" />
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
+                        </GridView>
+                    </ListView.View>
+                </ListView>
+
             </Grid>
             <Grid x:Name="shengji" Margin="3,3,3,3" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"  Visibility="Collapsed">
-                <Grid.Background>
-                    <SolidColorBrush Color="Black" Opacity="0.5"/>
-                </Grid.Background>
+                <Panel.Background>
+                    <SolidColorBrush SolidColorBrush.Color="Black" Brush.Opacity="0.5" />
+                </Panel.Background>
                 <Canvas>
-                    
+                    <TextBlock FrameworkElement.Margin="30,25,25,25" TextBlock.FontSize="16" TextBlock.Foreground="#FFFFFFFF">
+            软件升级，如安装在C盘，请以管理员模式运行升级。
+                    </TextBlock>
+                    <TextBlock FrameworkElement.Margin="30,50,25,25" TextBlock.FontSize="16" TextBlock.Foreground="#FFFFFFFF">
+            软件总共分成两部份，第一部分为数据库的升级，第二部份为程序本身的升级，请选择相应的升级选项。
+                    </TextBlock>
+                    <Canvas FrameworkElement.Width="700" FrameworkElement.Height="100" FrameworkElement.Margin="25,75,0,0">
+                        <Border Border.CornerRadius="10" FrameworkElement.Height="100" FrameworkElement.Width="1280" Border.Background="#4CFFFFFF" />
+                        <TextBlock FrameworkElement.Margin="15,10,5,5" TextBlock.FontSize="16" TextBlock.Foreground="#FFFFFFFF">
+              您当前的程序版本是
+                        </TextBlock>
+                        <TextBlock TextBlock.Name="local_program_version" FrameworkElement.Margin="170,10,5,5" TextBlock.FontSize="16" TextBlock.Foreground="#FF90EE90">
+              1.0.0.0
+                        </TextBlock>
+                        <TextBlock FrameworkElement.Margin="15,35,5,5" TextBlock.FontSize="16" TextBlock.Foreground="#FFFFFFFF">
+              服务器最新的程序版本是
+                        </TextBlock>
+                        <TextBlock TextBlock.Name="remote_program_version" FrameworkElement.Margin="205,35,5,5" TextBlock.FontSize="16" TextBlock.Foreground="#FF90EE90">
+              1.0.0.0
+                        </TextBlock>
+                        <TextBlock TextBlock.Name="program_update_notice" FrameworkElement.Margin="15,65,5,5" TextBlock.FontSize="16" TextBlock.Foreground="#FF90EE90">
+              你的程序是最新版本，无需升级
+                        </TextBlock>
+                        <ProgressBar ProgressBar.Name="program_update_ProcessBar" FrameworkElement.Width="700" FrameworkElement.Height="30" FrameworkElement.Margin="350,35,0,0" UIElement.Visibility="Collapsed" Control.Background="{x:Null}" />
+                        <Label FrameworkElement.Name="program_update_label" ContentControl.Content="0" FrameworkElement.HorizontalAlignment="Left" FrameworkElement.VerticalAlignment="Top" Canvas.Left="677" Canvas.Top="38" Control.Foreground="#FFFFFFFF" UIElement.Visibility="Collapsed" />
+                        <Button Button.Name="program_update_button" ContentControl.Content="软件升级" FrameworkElement.Margin="1150,30,0,0" FrameworkElement.Width="100" FrameworkElement.Height="40" />
+                        <Button Button.Name="close_update_button" ContentControl.Content="重启升级" FrameworkElement.Margin="1150,30,0,0" FrameworkElement.Width="100" FrameworkElement.Height="40" UIElement.Visibility="Collapsed" />
+                    </Canvas>
+                    <TextBlock FrameworkElement.Margin="30,190,5,5" TextBlock.FontSize="16" TextBlock.Foreground="#FFFFFFFF">
+            本地数据库只包含F10及股东数据
+                    </TextBlock>
+                    <Canvas FrameworkElement.Width="700" FrameworkElement.Height="100" FrameworkElement.Margin="25,215,0,0">
+                        <Border Border.CornerRadius="10" FrameworkElement.Height="100" FrameworkElement.Width="1280" Border.Background="#4CFFFFFF" />
+                        <TextBlock FrameworkElement.Margin="15,10,5,5" TextBlock.FontSize="16" TextBlock.Foreground="#FFFFFFFF">
+              您当前的数据库版本是
+                        </TextBlock>
+                        <TextBlock TextBlock.Name="local_db_version" FrameworkElement.Margin="180,10,5,5" TextBlock.FontSize="16" TextBlock.Foreground="#FF90EE90">
+              20170512
+                        </TextBlock>
+                        <TextBlock FrameworkElement.Margin="15,35,5,5" TextBlock.FontSize="16" TextBlock.Foreground="#FFFFFFFF">
+              服务器最新的数据库版本是
+                        </TextBlock>
+                        <TextBlock TextBlock.Name="remote_db_version" FrameworkElement.Margin="215,35,5,5" TextBlock.FontSize="16" TextBlock.Foreground="#FF90EE90">
+              20170512
+                        </TextBlock>
+                        <TextBlock TextBlock.Name="db_update_notice" FrameworkElement.Margin="15,65,5,5" TextBlock.FontSize="16" TextBlock.Foreground="#FF90EE90">
+              你的程序是最新版本，无需升级
+                        </TextBlock>
+                        <ProgressBar ProgressBar.Name="db_update_ProcessBar" FrameworkElement.Width="700" FrameworkElement.Height="30" FrameworkElement.Margin="350,35,0,0" UIElement.Visibility="Collapsed" Control.Background="{x:Null}" />
+                        <Label FrameworkElement.Name="db_update_label" ContentControl.Content="0" FrameworkElement.HorizontalAlignment="Left" FrameworkElement.VerticalAlignment="Top" Canvas.Left="677" Canvas.Top="38" Control.Foreground="#FFFFFFFF" UIElement.Visibility="Collapsed" />
+                        <Button Button.Name="db_update_button" ContentControl.Content="数据库升级" FrameworkElement.Margin="1150,30,0,0" FrameworkElement.Width="100" FrameworkElement.Height="40" />
+                    </Canvas>
                 </Canvas>
+                <Canvas />
+
             </Grid>
             
             <Grid x:Name="nothing" Margin="3,3,3,3" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"  Visibility="Collapsed">
