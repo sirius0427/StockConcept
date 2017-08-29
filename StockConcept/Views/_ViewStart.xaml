@@ -14,7 +14,7 @@
                   TitleBarHeight="38"
                   TitleVisibility="Collapsed" Icon="/Contents/Images/zyg_128X128.ico"
                   Title="抓妖股 选股神器" BorderThickness="0" TitleBarClickMode="2" Height="800" Width="1366" MinHeight="800" MinWidth="1366" WindowStartupLocation="CenterScreen"
-                  WindowTitleBarBg="{x:Null}" mc:Ignorable="d">
+                  WindowTitleBarBg="{x:Null}" mc:Ignorable="d" Closed="AyWindow_Closed">
     <!--标准使用control:     i:     ei:    ayi    vm -->
     <control:AyWindow.DataContext>
         <vm:ViewStartController />
@@ -796,7 +796,7 @@
                     <Grid.Background>
                         <SolidColorBrush Color="White" Opacity="0.6"/>
                     </Grid.Background>
-                    <TextBlock FontSize="40" VerticalAlignment="Center" HorizontalAlignment="Center" >什么内容也没有</TextBlock>
+                    <TextBlock FontSize="32" VerticalAlignment="Center" HorizontalAlignment="Center" >请在右上角搜索框输入查询内容</TextBlock>
                 </Grid>
             </Grid>
         </Grid>

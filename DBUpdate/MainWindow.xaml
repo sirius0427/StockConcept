@@ -1,0 +1,20 @@
+﻿<Window x:Class="DBUpdate.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:DBUpdate"
+        mc:Ignorable="d"
+        Title="正在升级..." Height="150" Width="525" WindowStartupLocation="CenterScreen">
+    <Grid>
+        <Canvas Margin="0,0,0,45">
+            <Label Canvas.Left="14" Canvas.Top="15">数据库正在升级，请耐心等待。。。</Label>
+        </Canvas>
+        <ProgressBar Name="program_update_ProcessBar" Height="16" Visibility="Visible" Background="{x:Null}" Canvas.Top="3" Margin="15,44,10,59" />
+        <Canvas Margin="188,32,188,61" >
+            <Label Name="program_update_label" Margin="0,0,0,0" Width="141" Height="26" HorizontalAlignment="Center" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" VerticalAlignment="Center" Canvas.Top="-19" >0</Label>
+
+        </Canvas>
+
+    </Grid>
+</Window>

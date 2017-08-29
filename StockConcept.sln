@@ -5,6 +5,10 @@ VisualStudioVersion = 15.0.26430.12
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StockConcept", "StockConcept\StockConcept.csproj", "{537EF696-F597-44FA-99F6-D75D47EA1070}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConceptUpdate", "ConceptUpdate\ConceptUpdate.csproj", "{D9446309-3C20-4559-8017-77D3019DC36A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DBUpdate", "DBUpdate\DBUpdate.csproj", "{BE30FAC0-2FAE-43B7-960A-EE09AAE20009}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +25,22 @@ Global
 		{537EF696-F597-44FA-99F6-D75D47EA1070}.Release|Any CPU.Build.0 = Release|Any CPU
 		{537EF696-F597-44FA-99F6-D75D47EA1070}.Release|x86.ActiveCfg = Release|x86
 		{537EF696-F597-44FA-99F6-D75D47EA1070}.Release|x86.Build.0 = Release|x86
+		{D9446309-3C20-4559-8017-77D3019DC36A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D9446309-3C20-4559-8017-77D3019DC36A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D9446309-3C20-4559-8017-77D3019DC36A}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{D9446309-3C20-4559-8017-77D3019DC36A}.Debug|x86.Build.0 = Debug|Any CPU
+		{D9446309-3C20-4559-8017-77D3019DC36A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D9446309-3C20-4559-8017-77D3019DC36A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D9446309-3C20-4559-8017-77D3019DC36A}.Release|x86.ActiveCfg = Release|Any CPU
+		{D9446309-3C20-4559-8017-77D3019DC36A}.Release|x86.Build.0 = Release|Any CPU
+		{BE30FAC0-2FAE-43B7-960A-EE09AAE20009}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BE30FAC0-2FAE-43B7-960A-EE09AAE20009}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BE30FAC0-2FAE-43B7-960A-EE09AAE20009}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{BE30FAC0-2FAE-43B7-960A-EE09AAE20009}.Debug|x86.Build.0 = Debug|Any CPU
+		{BE30FAC0-2FAE-43B7-960A-EE09AAE20009}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BE30FAC0-2FAE-43B7-960A-EE09AAE20009}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BE30FAC0-2FAE-43B7-960A-EE09AAE20009}.Release|x86.ActiveCfg = Release|Any CPU
+		{BE30FAC0-2FAE-43B7-960A-EE09AAE20009}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

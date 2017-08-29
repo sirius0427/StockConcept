@@ -25,6 +25,8 @@ namespace StockConcept
     /// <summary>
     /// _ViewStart.xaml 的交互逻辑
     /// </summary>
+    /// 
+
     public partial class _ViewStart : AyWindow
     {
         public string dbPath = "Data Source =" + Environment.CurrentDirectory + "/zyg.db";
@@ -825,6 +827,11 @@ namespace StockConcept
                 Clipboard.SetText(this.ListView_hudong.Items[this.ListView_hudong.SelectedIndex].ToString());
                 MessageBox.Show("选择的项已拷贝至粘贴板");
             }
+        }
+
+        private void AyWindow_Closed(object sender, EventArgs e)
+        {
+            Application.Current.Shutdown();
         }
     }
 
