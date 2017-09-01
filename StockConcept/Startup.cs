@@ -27,7 +27,7 @@ namespace StockConcept
             }
             catch (Exception)
             {
-                MessageBox.Show("查询失败了！");
+                //MessageBox.Show("查询失败了！");
             }
         }
 

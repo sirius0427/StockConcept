@@ -1,6 +1,5 @@
-﻿using System.Windows;
-using Ay.Framework.WPF.MVC;
-using System;
+﻿using Ay.Framework.WPF.MVC;
+using System.Windows;
 
 namespace StockConcept
 {

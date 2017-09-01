@@ -1,24 +1,21 @@
 ﻿using Ay.Framework.WPF.Controls;
+using CefSharp;
+using MySql.Data.MySqlClient;
+using StockConcept.Views;
 using System;
+using System.Collections.Generic;
+using System.Data.SQLite;
+using System.Linq;
+using System.Media;
+using System.Net;
+using System.Text.RegularExpressions;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Data.SQLite;
-using System.Windows.Documents;
-using MySql.Data.MySqlClient;
-using System.Collections.ObjectModel;
-using System.Threading;
-using System.Diagnostics;
-using System.ComponentModel;
-using System.Windows.Markup;
-using System.CodeDom.Compiler;
-using System.Windows.Threading;
-using System.Text.RegularExpressions;
-using System.Media;
-using System.Linq;
-using System.Collections.Generic;
-using StockConcept.Views;
 
 namespace StockConcept
 {
@@ -59,6 +56,7 @@ namespace StockConcept
             xingwen.Visibility = Visibility.Collapsed;
             hudong.Visibility = Visibility.Collapsed;
             shengji.Visibility = Visibility.Collapsed;
+            nothing.Visibility = Visibility.Collapsed;
         }
 
         private void F10题材搜索_Click(object sender, RoutedEventArgs e)
@@ -146,7 +144,8 @@ namespace StockConcept
                 conn = new SQLiteConnection(dbPath);//创建数据库实例，指定文件位置  
                 conn.Open();//打开数据库，若文件不存在会自动创建  
 
-                string sql = "SELECT point FROM dfcf_concept where sourcename = '" + listBox_ticai.SelectedItem.ToString() + "' and point like '%" + KeyWord.Text + "%' order by id";
+                //string sql = "SELECT point FROM dfcf_concept where sourcename = '" + listBox_ticai.SelectedItem.ToString() + "' and point like '%" + KeyWord.Text + "%' order by id";
+                string sql = "SELECT point FROM dfcf_concept where sourcename = '" + listBox_ticai.SelectedItem.ToString() + "' order by id";
                 SQLiteCommand cmdQ = new SQLiteCommand(sql, conn);
 
                 SQLiteDataReader reader = cmdQ.ExecuteReader();
@@ -165,7 +164,8 @@ namespace StockConcept
                     richTextBox_ticai.AppendText(Environment.NewLine);
                 }
 
-                sql = "SELECT point FROM ths_concept where sourcename = '" + listBox_ticai.SelectedItem.ToString() + "' and point like '%" + KeyWord.Text + "%' order by id";
+                //sql = "SELECT point FROM ths_concept where sourcename = '" + listBox_ticai.SelectedItem.ToString() + "' and point like '%" + KeyWord.Text + "%' order by id";
+                sql = "SELECT point FROM ths_concept where sourcename = '" + listBox_ticai.SelectedItem.ToString() + "' order by id";
                 cmdQ = new SQLiteCommand(sql, conn);
                 reader = cmdQ.ExecuteReader();
 
@@ -249,27 +249,30 @@ namespace StockConcept
 
         private void begin_search(object sender, RoutedEventArgs e)
         {
-            search_F10(sender, e);
-            search_gudong(sender, e);
-            search_xinwen(sender, e);
-            search_hudong(sender, e);
-            if ((bool)F10题材搜索.IsChecked)
+            if (this.F10题材搜索.IsChecked.Value)
             {
-                F10题材搜索_Click(sender, e);
+                this.search_F10(sender, e);
+                F10ticai.Visibility = Visibility.Visible;
+                nothing.Visibility = Visibility.Collapsed;
             }
-            else if ((bool)股东搜索.IsChecked)
+            else if (this.股东搜索.IsChecked.Value)
             {
-                股东搜索_Click(sender, e);
+                this.search_gudong(sender, e);
+                gudong.Visibility = Visibility.Visible;
+                nothing.Visibility = Visibility.Collapsed;
             }
-            else if ((bool)新闻搜索.IsChecked)
+            else if (this.新闻搜索.IsChecked.Value)
             {
-                新闻搜索_Click(sender, e);
+                this.search_xinwen(sender, e);
+                xingwen.Visibility = Visibility.Visible;
+                nothing.Visibility = Visibility.Collapsed;
             }
-            else if ((bool)互动搜索.IsChecked)
+            else if (this.互动搜索.IsChecked.Value)
             {
-                互动搜索_Click(sender, e);
+                this.search_hudong(sender, e);
+                hudong.Visibility = Visibility.Visible;
+                nothing.Visibility = Visibility.Collapsed;
             }
-
         }
 
         private void search_F10(object sender, RoutedEventArgs e)
@@ -281,7 +284,8 @@ namespace StockConcept
             conn = new SQLiteConnection(dbPath);//创建数据库实例，指定文件位置  
             conn.Open();//打开数据库，若文件不存在会自动创建  
 
-            string sql = "select distinct(sourcename) from (SELECT id,sourcename FROM dfcf_concept where point like '%" + KeyWord.Text + "%' union all SELECT id,sourcename FROM ths_concept where point like '%" + KeyWord.Text + "%') order by id";
+            //string sql = "select distinct(sourcename) from (SELECT id,sourcename FROM dfcf_concept where point like '%" + KeyWord.Text + "%' union all SELECT id,sourcename FROM ths_concept where point like '%" + KeyWord.Text + "%') order by id";
+            string sql = "select distinct(sourcename) from (SELECT id,sourcename FROM dfcf_concept where sourcename like '%" + KeyWord.Text + "%' union all SELECT id,sourcename FROM ths_concept where sourcename like '%" + KeyWord.Text + "%') order by id";
             SQLiteCommand cmdQ = new SQLiteCommand(sql, conn);
 
             SQLiteDataReader reader = cmdQ.ExecuteReader();
@@ -295,6 +299,20 @@ namespace StockConcept
                 Count1++;
             }
             reader.Close();
+
+            sql = "select distinct(sourcename) from (SELECT id,sourcename FROM dfcf_concept where point like '%" + KeyWord.Text + "%' union all SELECT id,sourcename FROM ths_concept where point like '%" + KeyWord.Text + "%') order by id";
+            cmdQ = new SQLiteCommand(sql, conn);
+
+            reader = cmdQ.ExecuteReader();
+
+            // 读取所有数据，添加到集合中
+            while (reader.Read())
+            {
+                listBox_ticai.Items.Add(reader["sourcename"]);
+                Count1++;
+            }
+            reader.Close();
+
             if (Count1 > 0)
             {
                 listBox_ticai.Focus();
@@ -474,6 +492,7 @@ namespace StockConcept
         private void search_hudong(object sender, RoutedEventArgs e)
         {
             //List<MyData> dataset_hudong = new List<MyData>();
+            dataset_hudong.Clear();
             String mysqlStr = "Database=zyg;Data Source=sirius0427.jios.org;User Id=cst;Password=q1w2e3r4t5Y^U&I*O(P);pooling=false;CharSet=utf8;port=3307";
             MySqlConnection mysql = new MySqlConnection(mysqlStr);
             mysql.Open();
@@ -483,7 +502,7 @@ namespace StockConcept
             reader.Read();
             hudong_lasttime = reader["time"].ToLong();
             reader.Close();
-            sqlSearch = "select from_unixtime(collectiontime/1000) as time,title,digest,sourcename from newsinfo where (title like '%" + KeyWord.Text + "%' or digest like '%" + KeyWord.Text + "%') and articletype='2' and collectiontime <= '" + hudong_lasttime + "' order by collectiontime desc limit 100" ;
+            sqlSearch = "select from_unixtime(collectiontime/1000) as time,title,digest,sourcename from newsinfo where (title like '%" + KeyWord.Text + "%' or digest like '%" + KeyWord.Text + "%') and articletype='2' order by collectiontime desc limit 100";
             mySqlCommand = new MySqlCommand(sqlSearch, mysql);
             reader = mySqlCommand.ExecuteReader();
             try
@@ -520,28 +539,31 @@ namespace StockConcept
                         string[] textArray1 = new string[] { "　　问：", str2, Environment.NewLine, "　　答：", reader["digest"].ToString() };
                         item.title = string.Concat(textArray1);
                         item.sourcename = str + "\n" + reader["time"].ToString();
-                        int num3 = 0;
-                        if (hudong_filter.IsChecked.Value)
-                        {
-                            foreach (string str4 in Regex.Split(hudong_filtertext.Text, ","))
-                            {
-                                if (item.title.IndexOf(str4) >= 0)
-                                {
-                                    num3 = 1;
-                                }
-                            }
-                        }
-                        else
-                        {
-                            num3 = 1;
-                        }
-                        if (num3 == 1)
-                        {
-                            dataset_hudong.Add(item);
-                        }
+                        //int num3 = 0;
+                        //if (hudong_filter.IsChecked.Value)
+                        //{
+                        //    foreach (string str4 in Regex.Split(hudong_filtertext.Text, ","))
+                        //    {
+                        //        if (item.title.IndexOf(str4) >= 0)
+                        //        {
+                        //            num3 = 1;
+                        //        }
+                        //    }
+                        //}
+                        //else
+                        //{
+                        //    num3 = 1;
+                        //}
+                        //if (num3 == 1)
+                        //{
+                        dataset_hudong.Add(item);
+                        //}
                     }
-                    ListView_hudong.ItemsSource = dataset_hudong;
+
+
                 }
+
+
             }
             catch (Exception)
             {
@@ -549,6 +571,8 @@ namespace StockConcept
             }
             finally
             {
+                ListView_hudong.ItemsSource = null;
+                ListView_hudong.ItemsSource = dataset_hudong;
                 reader.Close();
                 mysql.Close();
             }
@@ -640,29 +664,35 @@ namespace StockConcept
                         //thread1.IsBackground = true;
                         //thread1.Start(parameter);
 
-                        base.Dispatcher.BeginInvoke((Action)delegate
-                        {
-                            NotifyData data1 = new NotifyData();
-                            data1.Title = "抓妖股实时互动";
-                            data1.Content = parameter;
+                        //base.Dispatcher.BeginInvoke((Action)delegate
+                        //{
+                        //    NotifyData data1 = new NotifyData();
+                        //    data1.Title = "抓妖股实时互动";
+                        //    data1.Content = parameter;
 
-                            NotificationWindow dialog = new NotificationWindow();//new 一个通知
-                            dialog.Closed += Dialog_Closed;
-                            dialog.TopFrom = GetTopFrom();
-                            _dialogs.Add(dialog);
-                            dialog.DataContext = data1;//设置通知里要显示的数据
-                            dialog.Show();
-                        }, null);
+                        //    NotificationWindow dialog = new NotificationWindow();//new 一个通知
+                        //    dialog.Closed += Dialog_Closed;
+                        //    dialog.TopFrom = GetTopFrom();
+                        //    _dialogs.Add(dialog);
+                        //    dialog.DataContext = data1;//设置通知里要显示的数据
+                        //    dialog.Show();
+                        //}, null);
 
-                        base.Dispatcher.BeginInvoke((Action)delegate
+                        Dispatcher.BeginInvoke((Action)delegate
                         {
                             if (hudong_filter.IsChecked.Value)
                             {
+                                insertflag = 0;
                                 foreach (string str1 in Regex.Split(hudong_filtertext.Text, ",", RegexOptions.IgnoreCase))
                                 {
                                     if (data.title.IndexOf(str1) >= 0)
                                     {
-                                        insertflag = 1;
+                                        insertflag += 1;
+
+                                    }
+                                    else
+                                    {
+                                        insertflag += 0;
                                     }
                                 }
                             }
@@ -670,19 +700,29 @@ namespace StockConcept
                             {
                                 insertflag = 1;
                             }
-                            if (insertflag == 1)
+                            if (insertflag >= 1)
                             {
                                 dataset_hudong.Insert(0, data);
                                 new SoundPlayer("ring.wav").Play();
+                                NotifyData data1 = new NotifyData();
+                                data1.Title = "抓妖股实时互动" + insertflag.ToString();
+                                data1.Content = parameter;
 
+                                NotificationWindow dialog = new NotificationWindow();//new 一个通知
+                                dialog.Closed += Dialog_Closed;
+                                dialog.TopFrom = GetTopFrom();
+                                _dialogs.Add(dialog);
+                                dialog.DataContext = data1;//设置通知里要显示的数据
+                                dialog.Show();
                             }
                         }, null);
 
                     }
                 }
                 hudong_lasttime = hudong_maxtime;
-                base.Dispatcher.BeginInvoke((Action)delegate ()
+                Dispatcher.BeginInvoke((Action)delegate ()
                 {
+
                     ListView_hudong.ItemsSource = dataset_hudong;
                 }, null);
             }
@@ -831,7 +871,30 @@ namespace StockConcept
 
         private void AyWindow_Closed(object sender, EventArgs e)
         {
+
             Application.Current.Shutdown();
+        }
+
+        public static void SetCefCookies(string url, CookieCollection cookies)
+        {
+            Cef.GetGlobalCookieManager().SetStoragePath(Environment.CurrentDirectory, true);
+            foreach (System.Net.Cookie c in cookies)
+            {
+                var cookie = new CefSharp.Cookie
+                {
+                    Creation = DateTime.Now,
+                    Domain = c.Domain,
+                    Name = c.Name,
+                    Value = c.Value,
+                    Expires = c.Expires
+                };
+                Task<bool> task = Cef.GetGlobalCookieManager().SetCookieAsync(url, cookie);
+                while (!task.IsCompleted)
+                {
+                    continue;
+                }
+                bool b = task.Result;
+            }
         }
     }
 
